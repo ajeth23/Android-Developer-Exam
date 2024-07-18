@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ajecuacion.androiddeveloperexam.common.Resource
+import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.databinding.FragmentPersonListBinding
 import com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.adapter.PersonAdapter
 import com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.viewmodels.PersonViewModel

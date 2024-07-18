@@ -1,4 +1,4 @@
-package com.ajecuacion.androiddeveloperexam.common
+package com.ajecuacion.androiddeveloperexam.core.common
 
 
 sealed class Resource<T>(val data: T? = null, val message: String? = null) {

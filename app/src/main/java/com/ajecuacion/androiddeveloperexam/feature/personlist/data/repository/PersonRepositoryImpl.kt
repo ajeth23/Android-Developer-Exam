@@ -3,7 +3,7 @@ package com.ajecuacion.androiddeveloperexam.feature.personlist.data.repository
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.ajecuacion.androiddeveloperexam.common.Resource
+import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.RandomUserApi
 import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.local.PersonDao
 import com.ajecuacion.androiddeveloperexam.feature.personlist.data.mapper.toDomain

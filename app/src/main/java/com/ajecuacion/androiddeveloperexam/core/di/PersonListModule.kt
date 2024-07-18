@@ -1,4 +1,4 @@
-package com.ajecuacion.androiddeveloperexam.di
+package com.ajecuacion.androiddeveloperexam.core.di
 
 import android.content.Context
 import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.RandomUserApi
