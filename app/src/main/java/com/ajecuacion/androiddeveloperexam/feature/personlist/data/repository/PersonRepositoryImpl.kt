@@ -35,28 +35,32 @@ class PersonRepositoryImpl @Inject constructor(
         val cachedPersons = dao.getAllPersons().value
         if (!cachedPersons.isNullOrEmpty()) {
             emit(Resource.Success(cachedPersons.map { it.toDomain() }))
-        } else {
-            // Fetch from remote if cache is not available
-            try {
-                val response = api.getUsers(page = 1)
-                if (response.isSuccessful && response.body() != null) {
-                    val persons = response.body()!!.results.map {
-                        PersonEntity(
-                            id = it.name.first + it.name.last,
-                            name = "${it.name.first} ${it.name.last}",
-                            city = it.location.city ?: "Unknown City",
-                            pictureUrl = it.picture.large ?: ""
-                        )
-                    }
-                    dao.clear()
-                    dao.insertAll(persons)
-                    Log.d("PersonRepository", "Inserted ${persons.size} persons into database")
-                    currentPage = 1
-                    emit(Resource.Success(persons.map { it.toDomain() }))
-                } else {
+        }
+
+        // Fetch from remote if possible
+        try {
+            val response = api.getUsers(page = 1)
+            if (response.isSuccessful && response.body() != null) {
+                val persons = response.body()!!.results.map {
+                    PersonEntity(
+                        id = it.name.first + it.name.last,
+                        name = "${it.name.first} ${it.name.last}",
+                        city = it.location.city ?: "Unknown City",
+                        pictureUrl = it.picture.large ?: ""
+                    )
+                }
+                dao.clear()
+                dao.insertAll(persons)
+                Log.d("PersonRepository", "Inserted ${persons.size} persons into database")
+                currentPage = 1
+                emit(Resource.Success(persons.map { it.toDomain() }))
+            } else {
+                if (cachedPersons.isNullOrEmpty()) {
                     emit(Resource.Error("Failed to load data: ${response.message()}"))
                 }
-            } catch (e: Exception) {
+            }
+        } catch (e: Exception) {
+            if (cachedPersons.isNullOrEmpty()) {
                 emit(Resource.Error("Failed to load data: ${e.message}"))
             }
         }

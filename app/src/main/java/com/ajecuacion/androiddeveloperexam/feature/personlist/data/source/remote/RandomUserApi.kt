@@ -10,6 +10,5 @@ interface RandomUserApi {
     suspend fun getUsers(
         @Query("page") page: Int,
         @Query("results") results: Int = 10,
-        @Query("seed") seed: String = "default"
     ): Response<PersonResponse>
 }
