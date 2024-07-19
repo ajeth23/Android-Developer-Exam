@@ -2,8 +2,14 @@
 <resources>
 
 
-    <!-- Add circular shape style -->
+    <!-- circular shape style -->
     <style name="circleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Custom ShapeAppearanceOverlay for Circle ImageView -->
+    <style name="ShapeAppearanceOverlay.Material3.Circle.ImageView" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>

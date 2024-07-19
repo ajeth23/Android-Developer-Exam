@@ -5,6 +5,6 @@ import dagger.hilt.android.HiltAndroidApp
 
 
 @HiltAndroidApp
-class AndroidExam: Application(){
+class PersonsApplication: Application(){
 
 }

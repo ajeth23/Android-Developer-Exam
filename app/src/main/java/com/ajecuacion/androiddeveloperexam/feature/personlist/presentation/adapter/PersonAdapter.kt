@@ -13,7 +13,9 @@ import com.bumptech.glide.Glide
 private const val ITEM_TYPE_PERSON = 0
 private const val ITEM_TYPE_LOADING = 1
 
-class PersonAdapter : ListAdapter<Person, RecyclerView.ViewHolder>(DiffCallback()) {
+class PersonAdapter(
+    private val onPersonClick: (Person) -> Unit
+) : ListAdapter<Person, RecyclerView.ViewHolder>(DiffCallback()) {
 
     private var isLoading = false
 
@@ -25,7 +27,7 @@ class PersonAdapter : ListAdapter<Person, RecyclerView.ViewHolder>(DiffCallback(
         return if (viewType == ITEM_TYPE_PERSON) {
             val binding =
                 ItemPersonsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            PersonViewHolder(binding)
+            PersonViewHolder(binding, onPersonClick)
         } else {
             val binding =
                 ItemLoadingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -57,8 +59,10 @@ class PersonAdapter : ListAdapter<Person, RecyclerView.ViewHolder>(DiffCallback(
         }
     }
 
-    class PersonViewHolder(private val binding: ItemPersonsBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class PersonViewHolder(
+        private val binding: ItemPersonsBinding,
+        private val onPersonClick: (Person) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(person: Person) {
             binding.name.text = person.name
             binding.city.text = person.city
@@ -66,6 +70,10 @@ class PersonAdapter : ListAdapter<Person, RecyclerView.ViewHolder>(DiffCallback(
             Glide.with(binding.profilePic.context)
                 .load(pictureUrl)
                 .into(binding.profilePic)
+
+            binding.root.setOnClickListener {
+                onPersonClick(person)
+            }
         }
     }
 
