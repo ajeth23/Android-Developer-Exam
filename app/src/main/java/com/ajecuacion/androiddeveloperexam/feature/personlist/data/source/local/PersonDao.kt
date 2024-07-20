@@ -1,6 +1,5 @@
 package com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.local
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -9,12 +8,16 @@ import com.ajecuacion.androiddeveloperexam.feature.personlist.data.model.PersonE
 
 @Dao
 interface PersonDao {
-    @Query("SELECT * FROM person")
-    fun getAllPersons(): LiveData<List<PersonEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(persons: List<PersonEntity>)
+    suspend fun insertPersons(persons: List<PersonEntity>)
 
-    @Query("DELETE FROM person")
-    suspend fun clear()
+    @Query("SELECT * FROM persons")
+    suspend fun getAllPersons(): List<PersonEntity>
+
+    @Query("SELECT * FROM persons WHERE id = :personId")
+    suspend fun getPersonById(personId: String): PersonEntity?
+
+    @Query("DELETE FROM persons")
+    suspend fun deleteAllPersons()
 }

@@ -1,26 +1,34 @@
 package com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.viewmodel.PersonDetailViewModel
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.databinding.FragmentPersonDetailsBinding
-import com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.viewmodel.PersonDetailViewModel
 import com.bumptech.glide.Glide
+import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 @AndroidEntryPoint
 class PersonDetailFragment : Fragment() {
 
+    private val viewModel: PersonDetailViewModel by viewModels()
     private var _binding: FragmentPersonDetailsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: PersonDetailViewModel by viewModels()
+
+    private var isTitleVisible = false
+    private var personName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,36 +41,67 @@ class PersonDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val personId = arguments?.getString("person_id") ?: return
-        viewModel.loadPersonDetail(personId)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Navigate to the previous fragment
+                    findNavController().popBackStack()
+                }
+            })
 
-        lifecycleScope.launchWhenStarted {
+        val personId = arguments?.getString("personId") ?: return
+
+        setupCollapsingToolbar()
+
+        lifecycleScope.launch {
+            viewModel.loadPersonDetail(personId)
             viewModel.personDetail.collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
                         resource.data?.let { person ->
+                            personName = person.username
                             binding.apply {
+                                userName.text = person.username
                                 firstName.text = person.firstName
                                 lastName.text = person.lastName
-                                birthday.text = person.dob
-                                age.text = person.age.toString()
+                                birthday.text = formatDate(person.dob)
+                                age.text = calculateAge(person.dob).toString()
                                 email.text = person.email
-                                mobileNumber.text = person.cell
-                                address.text = person.address
-                                Glide.with(profileImage.context)
-                                    .load(person.picture)
+                                mobileNumber.text = person.phone
+                                address.text =
+                                    "${person.street}, ${person.city}, ${person.state}, ${person.country} - ${person.postcode}"
+                                contactPerson.text = person.contactPerson
+                                contactPersonPhoneNumber.text = person.contactPersonPhone
+                                Glide.with(profileImage)
+                                    .load(person.profilePicture)
                                     .into(profileImage)
                             }
-                            Log.d("PersonDetailFragment", "Data displayed: $person")
                         }
                     }
+
                     is Resource.Error -> {
-                        Log.e("PersonDetailFragment", "Error: ${resource.message}")
+                        // handle error
                     }
+
                     is Resource.Loading -> {
-                        Log.d("PersonDetailFragment", "Loading data...")
+                        // show loading
                     }
                 }
+            }
+        }
+    }
+
+    private fun setupCollapsingToolbar() {
+        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val totalScrollRange = appBarLayout.totalScrollRange
+            val isCollapsed = totalScrollRange + verticalOffset == 0
+
+            if (isCollapsed && !isTitleVisible) {
+                binding.collapsingToolbar.title = personName
+                isTitleVisible = true
+            } else if (!isCollapsed && isTitleVisible) {
+                binding.collapsingToolbar.title = ""
+                isTitleVisible = false
             }
         }
     }
@@ -70,5 +109,26 @@ class PersonDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun formatDate(date: String): String {
+        val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val targetFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        val dateObj = originalFormat.parse(date)
+        return targetFormat.format(dateObj!!)
+    }
+
+    private fun calculateAge(dob: String): Int {
+        val originalFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val dateObj = originalFormat.parse(dob)!!
+        val calendar = Calendar.getInstance()
+        val today = calendar.time
+        val birthDate = Calendar.getInstance().apply { time = dateObj }
+
+        var age = today.year - birthDate.time.year
+        if (today.month < birthDate.time.month || (today.month == birthDate.time.month && today.date < birthDate.time.date)) {
+            age--
+        }
+        return age
     }
 }
