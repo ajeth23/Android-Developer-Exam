@@ -1,85 +1,100 @@
 package com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.viewmodels
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ajecuacion.androiddeveloperexam.core.common.Constants
+import com.ajecuacion.androiddeveloperexam.core.common.Constants.PERSONS_KEY
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
-import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.use_case.GetPersonsUseCase
-import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.use_case.RefreshPersonsUseCase
-import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.use_case.LoadMorePersonsUseCase
-import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.use_case.UseCases
+import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.usecase.UseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PersonViewModel @Inject constructor(
-    private val useCases: UseCases
+    private val useCases: UseCases,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _persons = MutableLiveData<List<Person>>()
-    val persons: LiveData<List<Person>> get() = _persons
+    companion object {
 
-    private val _state = MutableLiveData<Resource<List<Person>>>()
-    val state: LiveData<Resource<List<Person>>> = _state
+    }
 
-    private val currentList = mutableListOf<Person>()
+    private val _persons = MutableStateFlow<Resource<List<Person>>>(Resource.Loading())
+    val persons: StateFlow<Resource<List<Person>>> = _persons.asStateFlow()
+
+    private val _toastEvent = MutableSharedFlow<String>()
+    val toastEvent: SharedFlow<String> = _toastEvent
+
+    var currentPage: Int
+        get() = savedStateHandle[Constants.CURRENT_PAGE_KEY] ?: 1
+        set(value) {
+            savedStateHandle[Constants.CURRENT_PAGE_KEY] = value
+        }
 
     init {
-        fetchCachedPersons()
+        savedStateHandle.get<List<Person>>(PERSONS_KEY)?.let { savedPersons ->
+            _persons.value = Resource.Success(savedPersons)
+        } ?: run {
+            getPersons()
+        }
     }
 
-    private fun fetchCachedPersons() {
-        useCases.getPersonsUseCase().observeForever { cachedPersons ->
-            if (!cachedPersons.isNullOrEmpty()) {
-                currentList.clear()
-                currentList.addAll(cachedPersons)
-                _persons.value = currentList
+    fun getPersons() {
+        viewModelScope.launch {
+            useCases.getPersonsUseCase().collect { resource ->
+                handleResource(resource) { newList ->
+                    _persons.value = Resource.Success(newList)
+                    savedStateHandle[PERSONS_KEY] = newList
+                }
             }
         }
     }
 
-    fun refreshData() {
+    fun refreshPersons() {
+        currentPage = 1
         viewModelScope.launch {
             useCases.refreshPersonsUseCase().collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        currentList.clear()
-                        currentList.addAll(resource.data ?: emptyList())
-                        _persons.value = currentList
-                    }
-
-                    is Resource.Loading -> {
-                        _state.value = Resource.Loading()
-                    }
-
-                    is Resource.Error -> {
-                        _state.value = Resource.Error(resource.message ?: "Unknown error")
-                    }
+                handleResource(resource) { newList ->
+                    _persons.value = Resource.Success(newList)
+                    savedStateHandle[PERSONS_KEY] = newList
                 }
             }
         }
     }
 
-    fun loadMoreData() {
+    fun loadMorePersons() {
         viewModelScope.launch {
-            useCases.loadMorePersonsUseCase().collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        val newData = resource.data ?: emptyList()
-                        currentList.addAll(newData)
-                        _persons.value = currentList
-                        _state.value = Resource.Success(currentList)
-                    }
-
-                    is Resource.Loading -> {
-                        _state.value = Resource.Loading()
-                    }
-
-                    is Resource.Error -> {
-                        _state.value = Resource.Error(resource.message ?: "Unknown error")
-                    }
+            useCases.loadMorePersonsUseCase(currentPage).collect { resource ->
+                handleResource(resource) { newList ->
+                    val currentList = (_persons.value as? Resource.Success)?.data.orEmpty()
+                    _persons.value = Resource.Success(currentList + newList)
+                    savedStateHandle[PERSONS_KEY] = currentList + newList
+                    currentPage++
                 }
             }
+        }
+    }
+
+    private suspend fun handleResource(
+        resource: Resource<List<Person>>,
+        onSuccess: (List<Person>) -> Unit
+    ) {
+        if (resource is Resource.Success) {
+            val newList = resource.data ?: emptyList()
+            onSuccess(newList)
+        } else {
+            _persons.value = resource
+        }
+        if (resource is Resource.Error) {
+            _toastEvent.emit(resource.message ?: "An error occurred")
         }
     }
 }

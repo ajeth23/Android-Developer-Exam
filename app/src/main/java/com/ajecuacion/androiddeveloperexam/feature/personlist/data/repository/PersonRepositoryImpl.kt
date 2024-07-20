@@ -1,93 +1,97 @@
 package com.ajecuacion.androiddeveloperexam.feature.personlist.data.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
+import android.content.Context
+import com.ajecuacion.androiddeveloperexam.core.common.NetworkUtil
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
-import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.RandomUserApi
+import com.ajecuacion.androiddeveloperexam.feature.personlist.data.mapper.toPerson
+import com.ajecuacion.androiddeveloperexam.feature.personlist.data.mapper.toPersonEntity
 import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.local.PersonDao
-import com.ajecuacion.androiddeveloperexam.feature.personlist.data.mapper.toDomain
-import com.ajecuacion.androiddeveloperexam.feature.personlist.data.model.PersonEntity
+import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.RandomUserApi
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.repository.PersonRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class PersonRepositoryImpl @Inject constructor(
+class PersonRepositoryImpl(
     private val api: RandomUserApi,
-    private val dao: PersonDao
+    private val dao: PersonDao,
+    private val context: Context
 ) : PersonRepository {
 
-    private var currentPage = 1
+    override fun getPersons(): Flow<Resource<List<Person>>> = flow {
+        emit(Resource.Loading())
+        val persons = dao.getAllPersons().map { it.toPerson() }
+        emit(Resource.Success(persons))
 
-    override fun getAllPersons(): LiveData<List<Person>> {
-        return dao.getAllPersons().map { entities ->
-            Log.d("PersonRepository", "Retrieved ${entities.size} persons from database")
-            entities.map { it.toDomain() }
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
+            emit(Resource.Error("Not connected to the internet"))
+            return@flow
+        }
+
+        val response = api.getUsers(page = 1)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
+            emit(Resource.Error("An unexpected error occurred"))
         }
     }
 
-    override suspend fun refreshData(): Flow<Resource<List<Person>>> = flow {
+    override fun getPersonDetails(personId: String): Flow<Resource<Person>> = flow {
+        emit(Resource.Loading())
+        val person = dao.getPersonById(personId)?.toPerson()
+        if (person != null) {
+            emit(Resource.Success(person))
+        } else {
+            emit(Resource.Error("Person not found"))
+        }
+    }
+
+    override fun refreshPersons(): Flow<Resource<List<Person>>> = flow {
         emit(Resource.Loading())
 
-        // Check if cache is available
-        val cachedPersons = dao.getAllPersons().value
-        if (!cachedPersons.isNullOrEmpty()) {
-            emit(Resource.Success(cachedPersons.map { it.toDomain() }))
+        val cachedPersons = dao.getAllPersons()
+        if (cachedPersons.isNotEmpty()) {
+            emit(Resource.Success(cachedPersons.map { it.toPerson() }))
         }
 
-        // Fetch from remote if possible
-        try {
-            val response = api.getUsers(page = 1)
-            if (response.isSuccessful && response.body() != null) {
-                val persons = response.body()!!.results.map {
-                    PersonEntity(
-                        id = it.name.first + it.name.last,
-                        name = "${it.name.first} ${it.name.last}",
-                        city = it.location.city ?: "Unknown City",
-                        pictureUrl = it.picture.large ?: ""
-                    )
-                }
-                dao.clear()
-                dao.insertAll(persons)
-                Log.d("PersonRepository", "Inserted ${persons.size} persons into database")
-                currentPage = 1
-                emit(Resource.Success(persons.map { it.toDomain() }))
-            } else {
-                if (cachedPersons.isNullOrEmpty()) {
-                    emit(Resource.Error("Failed to load data: ${response.message()}"))
-                }
-            }
-        } catch (e: Exception) {
-            if (cachedPersons.isNullOrEmpty()) {
-                emit(Resource.Error("Failed to load data: ${e.message}"))
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
+            emit(Resource.Error("Not connected to the internet"))
+            return@flow
+        }
+
+        val response = api.getUsers(page = 1)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.deleteAllPersons()
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
+            if (cachedPersons.isEmpty()) {
+                emit(Resource.Error("Failed to load data: ${response.message()}"))
             }
         }
     }
 
-    override suspend fun loadMoreData(): Flow<Resource<List<Person>>> = flow {
+    override fun loadMorePersons(page: Int): Flow<Resource<List<Person>>> = flow {
         emit(Resource.Loading())
 
-        try {
-            val response = api.getUsers(page = currentPage + 1)
-            if (response.isSuccessful && response.body() != null) {
-                val persons = response.body()!!.results.map {
-                    PersonEntity(
-                        id = it.name.first + it.name.last,
-                        name = "${it.name.first} ${it.name.last}",
-                        city = it.location.city ?: "Unknown City",
-                        pictureUrl = it.picture.large ?: ""
-                    )
-                }
-                dao.insertAll(persons)
-                currentPage++
-                emit(Resource.Success(persons.map { it.toDomain() }))
-            } else {
-                emit(Resource.Error("Failed to load more data: ${response.message()}"))
-            }
-        } catch (e: Exception) {
-            emit(Resource.Error("Failed to load more data: ${e.message}"))
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
+            emit(Resource.Error("Not connected to the internet"))
+            return@flow
+        }
+
+        val response = api.getUsers(page = page)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
+            emit(Resource.Error("An unexpected error occurred"))
         }
     }
 }

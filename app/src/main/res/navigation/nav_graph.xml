@@ -9,10 +9,16 @@
         android:id="@+id/personListFragment"
         android:name="com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.view.PersonListFragment"
         android:label="Person List"
-        tools:layout="@layout/fragment_person_list" >
+        tools:layout="@layout/fragment_person_list">
         <action
             android:id="@+id/action_personListFragment_to_personDetailFragment"
-            app:destination="@id/personDetailFragment" />
+            app:destination="@id/personDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+
     </fragment>
 
     <fragment
@@ -23,6 +29,13 @@
         <argument
             android:name="personId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_personListFragment_to_personDetailFragment"
+            app:destination="@id/personDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
 </navigation>
