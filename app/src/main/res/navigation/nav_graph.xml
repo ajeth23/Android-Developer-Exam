@@ -1,0 +1,28 @@
+<!-- res/navigation/nav_graph.xml -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/personListFragment">
+
+    <fragment
+        android:id="@+id/personListFragment"
+        android:name="com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.view.PersonListFragment"
+        android:label="Person List"
+        tools:layout="@layout/fragment_person_list" >
+        <action
+            android:id="@+id/action_personListFragment_to_personDetailFragment"
+            app:destination="@id/personDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/personDetailFragment"
+        android:name="com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.view.PersonDetailFragment"
+        android:label="Person Detail"
+        tools:layout="@layout/fragment_person_details">
+        <argument
+            android:name="personId"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

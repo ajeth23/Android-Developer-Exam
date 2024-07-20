@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- App Bar with Back Button and Title -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:navigationContentDescription="@string/back"
+        app:navigationIcon="@drawable/ic_back"
+        app:title="Profile"
+        app:titleCentered="true" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="16dp">
+
+            <!-- Profile Image with Edit Icon -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profileImage"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_person"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Circle.ImageView" />
+
+                <ImageView
+                    android:id="@+id/editIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="bottom|end"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_edit" />
+            </FrameLayout>
+
+            <!-- User Name -->
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Asini Sanja"
+                android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+            <!-- User Role -->
+            <TextView
+                android:id="@+id/userRole"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Designer"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="?attr/colorOutlineVariant" />
+
+            <!-- First Name -->
+            <TextView
+                android:id="@+id/firstNameLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="First name"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/firstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="Asini"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Last Name -->
+            <TextView
+                android:id="@+id/lastNameLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Last name"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/lastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="Sanja"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Birthday -->
+            <TextView
+                android:id="@+id/birthdayLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Birthday"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/birthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="01/01/1990"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Age -->
+            <TextView
+                android:id="@+id/ageLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Age"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/age"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="34"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Email Address -->
+            <TextView
+                android:id="@+id/emailLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Email address"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="asini.sanja@example.com"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Mobile Number -->
+            <TextView
+                android:id="@+id/mobileNumberLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Mobile number"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/mobileNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="+94 77 745 0101"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Address -->
+            <TextView
+                android:id="@+id/addressLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Address"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="123, Main Street, Colombo"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Contact Person -->
+            <TextView
+                android:id="@+id/contactPersonLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Contact person"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/contactPerson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="John Doe"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+            <!-- Contact Person's Phone Number -->
+            <TextView
+                android:id="@+id/contactPersonPhoneNumberLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Contact person's phone number"
+                android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+            <TextView
+                android:id="@+id/contactPersonPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:backgroundTint="?attr/colorSurface"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:padding="12dp"
+                android:text="+94 77 123 4567"
+                android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
