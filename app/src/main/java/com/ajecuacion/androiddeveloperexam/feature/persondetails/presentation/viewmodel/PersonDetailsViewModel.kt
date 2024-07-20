@@ -4,24 +4,25 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
-import com.ajecuacion.androiddeveloperexam.feature.persondetails.domain.model.PersonDetail
-import com.ajecuacion.androiddeveloperexam.feature.persondetails.domain.usecase.GetPersonDetailUseCase
+import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
+import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.usecase.GetPersonUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class PersonDetailViewModel @Inject constructor(
-    private val getPersonDetailUseCase: GetPersonDetailUseCase
+    private val getPersonDetailsUseCase: GetPersonUseCase
 ) : ViewModel() {
 
-    private val _personDetail = MutableStateFlow<Resource<PersonDetail>>(Resource.Loading())
-    val personDetail: StateFlow<Resource<PersonDetail>> = _personDetail
+    private val _personDetail = MutableStateFlow<Resource<Person>>(Resource.Loading())
+    val personDetail: StateFlow<Resource<Person>> = _personDetail
 
     fun loadPersonDetail(id: String) {
         viewModelScope.launch {
-            getPersonDetailUseCase(id).collect { resource ->
+            getPersonDetailsUseCase(id).collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
                         Log.d("PersonDetailViewModel", "Data loaded successfully: ${resource.data}")

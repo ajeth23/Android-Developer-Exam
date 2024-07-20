@@ -1,6 +1,6 @@
 package com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote
 
-import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.dto.PersonResponse
+import com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.dto.PersonDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -10,5 +10,5 @@ interface RandomUserApi {
     suspend fun getUsers(
         @Query("page") page: Int,
         @Query("results") results: Int = 10,
-    ): Response<PersonResponse>
+    ): Response<PersonDto>
 }
