@@ -11,8 +11,6 @@ import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Perso
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.repository.PersonRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.HttpException
-import java.io.IOException
 
 class PersonRepositoryImpl(
     private val api: RandomUserApi,
@@ -25,24 +23,18 @@ class PersonRepositoryImpl(
         val persons = dao.getAllPersons().map { it.toPerson() }
         emit(Resource.Success(persons))
 
-        if (!NetworkUtil.isNetworkAvailable(context)) {
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
             emit(Resource.Error("Not connected to the internet"))
             return@flow
         }
 
-        try {
-            val response = api.getUsers(page = 1)
-            if (response.isSuccessful) {
-                response.body()?.results?.let { results ->
-                    dao.insertPersons(results.map { it.toPersonEntity() })
-                    emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
-                }
-            } else {
-                emit(Resource.Error("An unexpected error occurred"))
-            }
-        } catch (e: HttpException) {
-            emit(Resource.Error("Couldn't reach the server. Check your internet connection"))
-        } catch (e: IOException) {
+        val response = api.getUsers(page = 1)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
             emit(Resource.Error("An unexpected error occurred"))
         }
     }
@@ -65,27 +57,21 @@ class PersonRepositoryImpl(
             emit(Resource.Success(cachedPersons.map { it.toPerson() }))
         }
 
-        if (!NetworkUtil.isNetworkAvailable(context)) {
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
             emit(Resource.Error("Not connected to the internet"))
             return@flow
         }
 
-        try {
-            val response = api.getUsers(page = 1)
-            if (response.isSuccessful) {
-                response.body()?.results?.let { results ->
-                    dao.deleteAllPersons()
-                    dao.insertPersons(results.map { it.toPersonEntity() })
-                    emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
-                }
-            } else {
-                if (cachedPersons.isEmpty()) {
-                    emit(Resource.Error("Failed to load data: ${response.message()}"))
-                }
-            }
-        } catch (e: Exception) {
+        val response = api.getUsers(page = 1)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.deleteAllPersons()
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
             if (cachedPersons.isEmpty()) {
-                emit(Resource.Error("Failed to load data: ${e.message}"))
+                emit(Resource.Error("Failed to load data: ${response.message()}"))
             }
         }
     }
@@ -93,24 +79,18 @@ class PersonRepositoryImpl(
     override fun loadMorePersons(page: Int): Flow<Resource<List<Person>>> = flow {
         emit(Resource.Loading())
 
-        if (!NetworkUtil.isNetworkAvailable(context)) {
+        if (!NetworkUtil.isNetworkAvailable(context) || !NetworkUtil.isInternetAvailable()) {
             emit(Resource.Error("Not connected to the internet"))
             return@flow
         }
 
-        try {
-            val response = api.getUsers(page = page)
-            if (response.isSuccessful) {
-                response.body()?.results?.let { results ->
-                    dao.insertPersons(results.map { it.toPersonEntity() })
-                    emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
-                }
-            } else {
-                emit(Resource.Error("An unexpected error occurred"))
-            }
-        } catch (e: HttpException) {
-            emit(Resource.Error("Couldn't reach the server. Check your internet connection"))
-        } catch (e: IOException) {
+        val response = api.getUsers(page = page)
+        if (response.isSuccessful) {
+            response.body()?.results?.let { results ->
+                dao.insertPersons(results.map { it.toPersonEntity() })
+                emit(Resource.Success(dao.getAllPersons().map { it.toPerson() }))
+            } ?: emit(Resource.Error("An unexpected error occurred"))
+        } else {
             emit(Resource.Error("An unexpected error occurred"))
         }
     }

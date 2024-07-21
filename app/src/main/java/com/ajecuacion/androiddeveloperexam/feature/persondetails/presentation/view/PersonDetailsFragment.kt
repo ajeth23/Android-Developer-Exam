@@ -7,18 +7,21 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.viewmodel.PersonDetailViewModel
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.databinding.FragmentPersonDetailsBinding
+import com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.viewmodel.PersonDetailViewModel
+import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 @AndroidEntryPoint
 class PersonDetailFragment : Fragment() {
@@ -41,10 +44,13 @@ class PersonDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.backIcon.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    // Navigate to the previous fragment
                     findNavController().popBackStack()
                 }
             })
@@ -53,40 +59,51 @@ class PersonDetailFragment : Fragment() {
 
         setupCollapsingToolbar()
 
-        lifecycleScope.launch {
-            viewModel.loadPersonDetail(personId)
-            viewModel.personDetail.collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        resource.data?.let { person ->
-                            personName = person.username
-                            binding.apply {
-                                userName.text = person.username
-                                firstName.text = person.firstName
-                                lastName.text = person.lastName
-                                birthday.text = formatDate(person.dob)
-                                age.text = calculateAge(person.dob).toString()
-                                email.text = person.email
-                                mobileNumber.text = person.phone
-                                address.text =
-                                    "${person.street}, ${person.city}, ${person.state}, ${person.country} - ${person.postcode}"
-                                contactPerson.text = person.contactPerson
-                                contactPersonPhoneNumber.text = person.contactPersonPhone
-                                Glide.with(profileImage)
-                                    .load(person.profilePicture)
-                                    .into(profileImage)
-                            }
-                        }
-                    }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loadPersonDetail(personId)
+                viewModel.personDetail.collect { resource ->
+                    handleResource(resource)
+                }
+            }
+        }
+    }
 
-                    is Resource.Error -> {
-                        // handle error
-                    }
-
-                    is Resource.Loading -> {
-                        // show loading
+    private fun handleResource(resource: Resource<Person>) {
+        when (resource) {
+            is Resource.Success -> {
+                resource.data?.let { person ->
+                    personName = "${person.firstName} ${person.lastName}"
+                    binding.apply {
+                        userName.text = "@${person.username}"
+                        firstName.text = person.firstName
+                        lastName.text = person.lastName
+                        birthday.text = formatDate(person.dob)
+                        age.text = calculateAge(person.dob).toString()
+                        email.text = person.email
+                        mobileNumber.text = person.phone
+                        address.text =
+                            "${person.street}, ${person.city}, ${person.state}, ${person.country} - ${person.postcode}"
+                        contactPerson.text = person.contactPerson
+                        contactPersonPhoneNumber.text = person.contactPersonPhone
+                        Glide.with(profileImage)
+                            .load(person.profilePicture)
+                            .into(profileImage)
                     }
                 }
+            }
+
+            is Resource.Error -> {
+                Snackbar.make(
+                    binding.root,
+                    resource.message ?: "An error occurred",
+                    Snackbar.LENGTH_LONG
+                ).show()
+                //error
+            }
+
+            is Resource.Loading -> {
+                //loading
             }
         }
     }

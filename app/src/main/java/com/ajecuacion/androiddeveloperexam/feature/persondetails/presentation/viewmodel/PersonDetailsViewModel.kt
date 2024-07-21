@@ -1,11 +1,10 @@
 package com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ajecuacion.androiddeveloperexam.core.common.Resource
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
-import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.usecase.GetPersonUseCase
+import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.usecase.UseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonDetailViewModel @Inject constructor(
-    private val getPersonDetailsUseCase: GetPersonUseCase
+    private val useCases: UseCases
 ) : ViewModel() {
 
     private val _personDetail = MutableStateFlow<Resource<Person>>(Resource.Loading())
@@ -22,18 +21,7 @@ class PersonDetailViewModel @Inject constructor(
 
     fun loadPersonDetail(id: String) {
         viewModelScope.launch {
-            getPersonDetailsUseCase(id).collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        Log.d("PersonDetailViewModel", "Data loaded successfully: ${resource.data}")
-                    }
-                    is Resource.Error -> {
-                        Log.e("PersonDetailViewModel", "Error loading data: ${resource.message}")
-                    }
-                    is Resource.Loading -> {
-                        Log.d("PersonDetailViewModel", "Loading data...")
-                    }
-                }
+            useCases.getPersonDetailsUseCase(id).collect { resource ->
                 _personDetail.value = resource
             }
         }
