@@ -17,7 +17,7 @@
         android:theme="@style/Theme.AndroidDeveloperExam"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".feature.main.MainActivity"
             android:configChanges="orientation|screenSize|screenLayout"
             android:exported="true">
             <intent-filter>
