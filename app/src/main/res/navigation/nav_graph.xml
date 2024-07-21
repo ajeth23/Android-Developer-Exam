@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/personListFragment"
-        android:name="com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.view.PersonListFragment"
+        android:name="com.ajecuacion.androiddeveloperexam.feature.randomPerson.presentation.view.PersonListFragment"
         android:label="Person List"
         tools:layout="@layout/fragment_person_list">
         <action
@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/personDetailFragment"
-        android:name="com.ajecuacion.androiddeveloperexam.feature.persondetails.presentation.view.PersonDetailFragment"
+        android:name="com.ajecuacion.androiddeveloperexam.feature.randomPerson.presentation.view.PersonDetailFragment"
         android:label="Person Detail"
         tools:layout="@layout/fragment_person_details">
         <argument

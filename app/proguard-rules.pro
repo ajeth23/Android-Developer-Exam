@@ -32,27 +32,27 @@
 -keep class com.ajecuacion.androiddeveloperexam.PersonsApplication { *; }
 
 # Keep the data layer classes and their methods
--keep class com.ajecuacion.androiddeveloperexam.feature.personlist.data.** { *; }
--dontwarn com.ajecuacion.androiddeveloperexam.feature.personlist.data.**
+-keep class com.ajecuacion.androiddeveloperexam.feature.randomPerson.data.** { *; }
+-dontwarn com.ajecuacion.androiddeveloperexam.feature.randomPerson.data.**
 
 # Keep the data transfer objects (DTOs)
--keep class com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.dto.** { *; }
+-keep class com.ajecuacion.androiddeveloperexam.feature.randomPerson.data.source.remote.dto.** { *; }
 
 # Keep Retrofit models and methods
--keep class com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.api.** { *; }
--dontwarn com.ajecuacion.androiddeveloperexam.feature.personlist.data.source.remote.api.**
+-keep class com.ajecuacion.androiddeveloperexam.feature.randomPerson.data.source.remote.api.** { *; }
+-dontwarn com.ajecuacion.androiddeveloperexam.feature.randomPerson.data.source.remote.api.**
 
 # Keep Room database classes and methods
 -keep class androidx.room.** { *; }
 -dontwarn androidx.room.**
 
 # Keep the domain layer classes and their methods
--keep class com.ajecuacion.androiddeveloperexam.feature.personlist.domain.** { *; }
--dontwarn com.ajecuacion.androiddeveloperexam.feature.personlist.domain.**
+-keep class com.ajecuacion.androiddeveloperexam.feature.randomPerson.domain.** { *; }
+-dontwarn com.ajecuacion.androiddeveloperexam.feature.randomPerson.domain.**
 
 # Keep the ViewModel classes and their methods
--keep class com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.viewmodels.** { *; }
--dontwarn com.ajecuacion.androiddeveloperexam.feature.personlist.presentation.viewmodels.**
+-keep class com.ajecuacion.androiddeveloperexam.feature.randomPerson.presentation.viewmodels.** { *; }
+-dontwarn com.ajecuacion.androiddeveloperexam.feature.randomPerson.presentation.viewmodels.**
 
 # Keep classes with specific annotations (like @Inject)
 -keepclasseswithmembers class * {
