@@ -108,21 +108,6 @@ class PersonDetailFragment : Fragment() {
         }
     }
 
-    private fun setupCollapsingToolbar() {
-        binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val totalScrollRange = appBarLayout.totalScrollRange
-            val isCollapsed = totalScrollRange + verticalOffset == 0
-
-            if (isCollapsed && !isTitleVisible) {
-                binding.collapsingToolbar.title = personName
-                isTitleVisible = true
-            } else if (!isCollapsed && isTitleVisible) {
-                binding.collapsingToolbar.title = ""
-                isTitleVisible = false
-            }
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
