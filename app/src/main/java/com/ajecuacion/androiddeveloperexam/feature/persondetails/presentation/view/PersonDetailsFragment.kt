@@ -99,10 +99,11 @@ class PersonDetailFragment : Fragment() {
                     resource.message ?: "An error occurred",
                     Snackbar.LENGTH_LONG
                 ).show()
+                //error
             }
 
             is Resource.Loading -> {
-                Snackbar.make(binding.root, "Loading...", Snackbar.LENGTH_LONG).show()
+                //loading
             }
         }
     }
