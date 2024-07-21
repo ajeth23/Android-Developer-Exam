@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ajecuacion.androiddeveloperexam.feature.personlist.domain.model.Person
 import com.ajecuacion.androiddeveloperexam.databinding.ItemPersonBinding
 import com.ajecuacion.androiddeveloperexam.databinding.ItemLoadingBinding
-import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 
 class PersonAdapter(private val onItemClickListener: OnItemClickListener) : ListAdapter<Person, RecyclerView.ViewHolder>(PersonDiffCallback()) {
