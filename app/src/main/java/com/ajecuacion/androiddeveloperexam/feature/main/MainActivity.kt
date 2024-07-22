@@ -1,4 +1,4 @@
-package com.ajecuacion.androiddeveloperexam
+package com.ajecuacion.androiddeveloperexam.feature.main
 
 import android.os.Bundle
 import android.view.View
@@ -11,7 +11,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.ajecuacion.androiddeveloperexam.feature.main.MainActivityViewModel
+import com.ajecuacion.androiddeveloperexam.R
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
